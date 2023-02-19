@@ -1,19 +1,35 @@
+import { addContactAction } from ' redux/contacts/contact-slice';
+import { selectContacts } from ' redux/contacts/contactsSelector';
+import { nanoid } from 'nanoid';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import css from './formPhonebook.module.scss';
 
-const FormPhonebook = ({ onSubmit }) => {
+const FormPhonebook = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const actions = { name: setName, number: setNumber };
-
+  const dispatch = useDispatch();
   const handleChange = e => {
     const { name, value } = e.target;
     actions[name](value);
   };
 
+  const contacts = useSelector(selectContacts);
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit({ name, number });
+    // onSubmit({ name, number });
+    const newContact = { name, number, id: nanoid() };
+    if (
+      contacts.some(
+        item => item.name.toLowerCase().trim() === name.toLowerCase().trim()
+      )
+    ) {
+      alert(`${name} is already in contacts`);
+      return;
+    }
+    dispatch(addContactAction(newContact));
+
     setName('');
     setNumber('');
   };
